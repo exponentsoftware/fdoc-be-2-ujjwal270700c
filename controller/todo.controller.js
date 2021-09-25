@@ -103,25 +103,18 @@ exports.filterByTitleAndCategory=async (req,res)=>{
     try {
         const {title,category}=req.query
         console.log(title,category);
-        if(title && category){
-            const data = await TodoModel.find({
-                title:{$regex:title,$options: '$i'},
-                category:category   
-                 }).sort({createdAt:-1});
-                 res.status(200).json(data);
+        let findQuery={}
+        if(category && category !== ""){
+            findQuery.category=category
         }
-        if(title && !category){
-            const data = await TodoModel.find({
-                title:{$regex:title,$options: '$i'},
-                 }).sort({createdAt:-1});
-                 res.status(200).json(data);
+        if(title && title !==""){
+            findQuery.title={$regex:title,$options: '$i'};
         }
-        if(category && !title ){
-            const data = await TodoModel.find({
-                category:category  
-                 }).sort({createdAt:-1});
-                 res.status(200).json(data);
-        }
+        const data= await TodoModel.find(findQuery)
+        return res.status(201).json({
+            status:"Success",
+            data:data
+        });
     } catch (error) {
         res.status(400).json({
             message:error.message
